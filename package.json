@@ -1,0 +1,71 @@
+{
+  "name": "country-info-pro",
+  "version": "1.2.0",
+  "description": "Comprehensive country information with fuzzy search, country groupings (EU, NATO, G7, BRICS), and 250 countries - zero dependencies",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "country",
+    "countries",
+    "iso",
+    "alpha-2",
+    "alpha-3",
+    "currency",
+    "timezone",
+    "flag",
+    "phone-code",
+    "country-info",
+    "eu",
+    "nato",
+    "g7",
+    "g20",
+    "brics",
+    "asean",
+    "country-groupings",
+    "postal-code",
+    "country-data",
+    "iso-3166"
+  ],
+  "author": "Balamurugan <infobalamurugan22@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balamurugan-thiruganasammantham/country-info-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/balamurugan-thiruganasammantham/country-info-pro/issues"
+  },
+  "homepage": "https://github.com/balamurugan-thiruganasammantham/country-info-pro#readme",
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "fetch-data": "tsx scripts/fetch-data.ts",
+    "bench": "tsx scripts/benchmark.ts",
+    "prepublishOnly": "npm run build && npm run test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.0.0",
+    "tsx": "^4.0.0"
+  }
+}
