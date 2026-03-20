@@ -257,6 +257,56 @@ interface Country {
 - **Country comparison** — structured side-by-side diff of any two countries
 - **Random country** — with optional filter predicate
 
+## Development & Release Workflow
+
+### Setup
+
+```bash
+git clone https://github.com/balamurugan-thiruganasammantham/country-info-pro.git
+cd country-info-pro
+npm install
+```
+
+### Making Changes
+
+```bash
+# 1. Make your code changes
+# 2. Run tests locally
+npm test
+
+# 3. Commit and push
+git add .
+git commit -m "describe your changes"
+git push origin main
+```
+
+**What happens:** GitHub Actions CI automatically runs typecheck + tests + build on Node 18 & 20.
+
+### Publishing a New Version to npm
+
+```bash
+# 1. Bump version (choose one)
+npm version patch   # 1.2.0 → 1.2.1 (bug fixes)
+npm version minor   # 1.2.0 → 1.3.0 (new features)
+npm version major   # 1.2.0 → 2.0.0 (breaking changes)
+
+# 2. Push with tags — this triggers auto-publish to npm
+git push origin main --tags
+```
+
+**What happens:** GitHub Actions Publish workflow runs tests, builds, and publishes to npm automatically.
+
+### Quick Reference
+
+| Action | Command | Result |
+|--------|---------|--------|
+| Run tests | `npm test` | Runs all 104 unit tests |
+| Type check | `npm run typecheck` | Validates TypeScript |
+| Build | `npm run build` | Generates dist/ (CJS + ESM) |
+| Push code | `git push origin main` | CI runs (tests only) |
+| Release to npm | `npm version patch && git push origin main --tags` | CI + auto-publish to npm |
+| Benchmark | `npm run bench` | Performance benchmarks |
+
 ## Data Sources
 
 Country data sourced from [mledoze/countries](https://github.com/mledoze/countries), enriched with population estimates, timezone data, postal code formats, and flag/map URLs.
