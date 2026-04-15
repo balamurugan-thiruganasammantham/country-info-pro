@@ -101,3 +101,31 @@
 - Country comparison serves common use cases (e.g., decision tools, infographics)
 - Random country generator is useful for quizzes, demos, and testing
 - Early termination improves search performance for exact-match queries
+
+## [2026-04-15] — Improvement Cycle 4 (v1.3.0)
+
+### Added
+- **3 new API functions**: `getCountriesByDrivingSide()`, `getCountriesByTimezone()`, `getCountryByPhoneCode()`
+- **2 new FilterOptions**: `drivingSide` and `timezone` in `filterCountries()`
+- **Node 22** added to CI matrix (now tests on Node 18, 20, 22)
+- **npm provenance** support in publish workflow for supply chain security
+- **Bundle size check** in CI — fails build if CJS exceeds 500KB
+- **10 new unit tests** (114 total)
+- **Automation token** for npm — CI/CD auto-publish now works without OTP
+
+### Improved
+- **Bundle size reduced 36%**: 460KB → 293KB CJS (stripped nativeName, coatOfArms, capitalInfo, cioc, status + minified JSON)
+- **README completely rewritten**: 34-function API table, 12-row comparison table, use cases, CommonJS example, SEO keywords
+- **package.json SEO**: 20 → 32 keywords, added engines field
+- Both GitHub repos synced with identical code
+
+### Breaking Changes
+- Removed coatOfArms, capitalInfo, cioc, status fields from Country type
+- Removed nativeName from CountryName type
+- Removed CoatOfArms type export
+
+### Reason
+- Downloads dropped post-launch — needed better SEO, discoverability, smaller bundle
+- Unused fields inflated bundle size by 196KB
+- Missing timezone/driving side filters were gaps vs real-world needs
+- CI/CD auto-publish needed automation token to bypass 2FA
