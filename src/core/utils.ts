@@ -1,5 +1,5 @@
 import type { Country } from "../types";
-import { getAll } from "../utils/loader";
+import { getAll, byAlpha2, byAlpha3, byNumeric, byName } from "../utils/loader";
 
 /**
  * Generates an emoji flag from a country's alpha-2 code.
@@ -264,6 +264,129 @@ export function getAllTimezones(): Array<{
   return Array.from(map.entries())
     .map(([timezone, countries]) => ({ timezone, countries }))
     .sort((a, b) => a.timezone.localeCompare(b.timezone));
+}
+
+export type Hemisphere = "northern" | "southern" | "eastern" | "western";
+
+/**
+ * Returns countries located in a given hemisphere based on their latlng center point.
+ * - "northern": latitude >= 0
+ * - "southern": latitude < 0
+ * - "eastern": longitude >= 0
+ * - "western": longitude < 0
+ */
+export function getCountriesByHemisphere(hemisphere: Hemisphere): Country[] {
+  return getAll().filter((c) => {
+    const [lat, lon] = c.latlng;
+    switch (hemisphere) {
+      case "northern": return lat >= 0;
+      case "southern": return lat < 0;
+      case "eastern": return lon >= 0;
+      case "western": return lon < 0;
+    }
+  });
+}
+
+/**
+ * Normalizes any country input (name, alpha-2, alpha-3, numeric, alias) to an ISO 3166-1 alpha-2 code.
+ * Accepts: country name, alpha-2, alpha-3, or numeric code.
+ * Returns undefined if no country matches.
+ */
+export function toCountryCode(input: string): string | undefined {
+  const trimmed = input.trim();
+  if (!trimmed) return undefined;
+
+  const lower = trimmed.toLowerCase();
+
+  // Try alpha-2
+  const a2 = byAlpha2(trimmed);
+  if (a2) return a2.cca2;
+
+  // Try alpha-3
+  if (trimmed.length === 3 && /^[A-Za-z]{3}$/.test(trimmed)) {
+    const a3 = byAlpha3(trimmed);
+    if (a3) return a3.cca2;
+  }
+
+  // Try numeric
+  if (/^\d{3}$/.test(trimmed)) {
+    const num = byNumeric(trimmed);
+    if (num) return num.cca2;
+  }
+
+  // Try name
+  const named = byName(trimmed);
+  if (named) return named.cca2;
+
+  return undefined;
+}
+
+/** Aggregate statistics about the entire country dataset. */
+export interface CountryStats {
+  totalCountries: number;
+  totalPopulation: number;
+  totalArea: number;
+  averagePopulation: number;
+  averageArea: number;
+  mostPopulous: { name: string; population: number };
+  leastPopulous: { name: string; population: number };
+  largest: { name: string; area: number };
+  smallest: { name: string; area: number };
+  mostLanguages: { name: string; count: number };
+  mostBorders: { name: string; count: number };
+  totalLanguages: number;
+  totalCurrencies: number;
+  totalTimezones: number;
+}
+
+/**
+ * Returns aggregate statistics about the entire 250-country dataset.
+ */
+export function getCountryStats(): CountryStats {
+  const all = getAll();
+
+  let totalPop = 0;
+  let totalArea = 0;
+  let mostPop = all[0];
+  let leastPop = all[0];
+  let largest = all[0];
+  let smallest = all[0];
+  let mostLangs = all[0];
+  let mostBords = all[0];
+  const langSet = new Set<string>();
+  const curSet = new Set<string>();
+  const tzSet = new Set<string>();
+
+  for (const c of all) {
+    totalPop += c.population;
+    totalArea += c.area;
+    if (c.population > mostPop.population) mostPop = c;
+    if (c.population > 0 && (leastPop.population === 0 || c.population < leastPop.population)) leastPop = c;
+    if (c.area > largest.area) largest = c;
+    if (c.area > 0 && (smallest.area === 0 || c.area < smallest.area)) smallest = c;
+    if (Object.keys(c.languages).length > Object.keys(mostLangs.languages).length) mostLangs = c;
+    if (c.borders.length > mostBords.borders.length) mostBords = c;
+    for (const code of Object.keys(c.languages)) langSet.add(code);
+    for (const code of Object.keys(c.currencies)) curSet.add(code);
+    for (const tz of c.timezones) tzSet.add(tz);
+  }
+
+  return {
+    totalCountries: all.length,
+    totalPopulation: totalPop,
+    totalArea: Math.round(totalArea),
+    averagePopulation: Math.round(totalPop / all.length),
+    averageArea: Math.round(totalArea / all.length),
+    mostPopulous: { name: mostPop.name.common, population: mostPop.population },
+    leastPopulous: { name: leastPop.name.common, population: leastPop.population },
+    largest: { name: largest.name.common, area: largest.area },
+    smallest: { name: smallest.name.common, area: smallest.area },
+    mostLanguages: { name: mostLangs.name.common, count: Object.keys(mostLangs.languages).length },
+    mostBorders: { name: mostBords.name.common, count: mostBords.borders.length },
+    totalLanguages: langSet.size,
+    totalCurrencies: curSet.size,
+    totalTimezones: tzSet.size,
+  };
 }
 
 /** Simplified country summary for common use cases. */

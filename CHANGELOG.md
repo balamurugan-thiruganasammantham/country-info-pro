@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-04-15
+
+### Added
+- **`getCountriesByHemisphere(hemisphere)`**: filter by northern, southern, eastern, or western hemisphere based on latlng center point
+- **`toCountryCode(input)`**: normalizes any input (name, alpha-2, alpha-3, numeric) to ISO 3166-1 alpha-2 code
+- **`getCountryStats()`**: returns aggregate statistics — total population, area, most/least populous, largest/smallest, most languages, most borders, unique language/currency/timezone counts
+- **`Hemisphere`, `CountryStats` types**: exported for TypeScript consumers
+- 10 new unit tests (148 total across 5 test files)
+
+### Improved
+- **Bundle size reduced 15%**: 299KB → 257KB CJS via tsup minification
+- Total exported functions: 43 → 46
+- Total exported types: 17 → 19 (Hemisphere, CountryStats)
+
 ## [1.5.0] - 2026-04-15
 
 ### Added

@@ -8,6 +8,9 @@ import {
   getCountriesByPopulation,
   getCountriesByArea,
   getCountriesByBorderCount,
+  getCountriesByHemisphere,
+  toCountryCode,
+  getCountryStats,
   sortCountries,
   getAllCurrencies,
   getAllLanguages,
@@ -295,6 +298,88 @@ describe("filterCountries with population/area ranges", () => {
     });
     expect(countries.length).toBeGreaterThan(0);
     expect(countries.every((c) => c.area <= 500)).toBe(true);
+  });
+});
+
+describe("getCountriesByHemisphere", () => {
+  it("returns northern hemisphere countries", () => {
+    const countries = getCountriesByHemisphere("northern");
+    expect(countries.length).toBeGreaterThan(150);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("US");
+    expect(codes).toContain("IN");
+    expect(codes).toContain("GB");
+  });
+
+  it("returns southern hemisphere countries", () => {
+    const countries = getCountriesByHemisphere("southern");
+    expect(countries.length).toBeGreaterThan(30);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("AU");
+    expect(codes).toContain("BR");
+    expect(codes).toContain("ZA");
+  });
+
+  it("returns eastern hemisphere countries", () => {
+    const countries = getCountriesByHemisphere("eastern");
+    expect(countries.length).toBeGreaterThan(100);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("IN");
+    expect(codes).toContain("JP");
+  });
+
+  it("returns western hemisphere countries", () => {
+    const countries = getCountriesByHemisphere("western");
+    expect(countries.length).toBeGreaterThan(30);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("US");
+    expect(codes).toContain("BR");
+  });
+});
+
+describe("toCountryCode", () => {
+  it("normalizes country name to alpha-2", () => {
+    expect(toCountryCode("India")).toBe("IN");
+    expect(toCountryCode("France")).toBe("FR");
+  });
+
+  it("normalizes alpha-3 to alpha-2", () => {
+    expect(toCountryCode("USA")).toBe("US");
+    expect(toCountryCode("DEU")).toBe("DE");
+  });
+
+  it("normalizes numeric to alpha-2", () => {
+    expect(toCountryCode("356")).toBe("IN");
+  });
+
+  it("passes through alpha-2", () => {
+    expect(toCountryCode("US")).toBe("US");
+    expect(toCountryCode("in")).toBe("IN");
+  });
+
+  it("returns undefined for invalid input", () => {
+    expect(toCountryCode("XXXXX")).toBeUndefined();
+    expect(toCountryCode("")).toBeUndefined();
+  });
+});
+
+describe("getCountryStats", () => {
+  it("returns aggregate statistics", () => {
+    const stats = getCountryStats();
+    expect(stats.totalCountries).toBe(250);
+    expect(stats.totalPopulation).toBeGreaterThan(7_000_000_000);
+    expect(stats.totalArea).toBeGreaterThan(100_000_000);
+    expect(stats.averagePopulation).toBeGreaterThan(0);
+    expect(stats.averageArea).toBeGreaterThan(0);
+    expect(stats.mostPopulous.name).toBeDefined();
+    expect(stats.mostPopulous.population).toBeGreaterThan(1_000_000_000);
+    expect(stats.leastPopulous.population).toBeGreaterThan(0);
+    expect(stats.largest.name).toBe("Russia");
+    expect(stats.smallest.area).toBeGreaterThan(0);
+    expect(stats.totalLanguages).toBeGreaterThan(100);
+    expect(stats.totalCurrencies).toBeGreaterThan(100);
+    expect(stats.totalTimezones).toBeGreaterThan(30);
+    expect(stats.mostBorders.count).toBeGreaterThan(10);
   });
 });
 

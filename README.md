@@ -6,11 +6,11 @@
 [![CI](https://github.com/balamurugan-thiruganasammantham/country-info-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/balamurugan-thiruganasammantham/country-info-pro/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue.svg)](https://www.typescriptlang.org/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0-green.svg)](https://www.npmjs.com/package/country-info-pro)
-[![Bundle Size](https://img.shields.io/badge/bundle-290KB-brightgreen)](https://www.npmjs.com/package/country-info-pro)
+[![Bundle Size](https://img.shields.io/badge/bundle-257KB-brightgreen)](https://www.npmjs.com/package/country-info-pro)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-> The most comprehensive country data package for Node.js and TypeScript. 250 countries. 43 functions. Zero dependencies. Built-in fuzzy search.
+> The most comprehensive country data package for Node.js and TypeScript. 250 countries. 46 functions. Zero dependencies. Built-in fuzzy search.
 
 Get detailed data for **250 countries**: names, ISO codes, capitals, currencies, phone codes, timezones, languages, populations, flags, maps, borders, postal codes, driving side, and 18 political/economic groupings (EU, NATO, G7, BRICS, ASEAN, etc.).
 
@@ -19,7 +19,7 @@ Get detailed data for **250 countries**: names, ISO codes, capitals, currencies,
 | Feature | country-info-pro | country-list | i18n-iso-countries | world-countries |
 |---------|:---:|:---:|:---:|:---:|
 | Countries | 250 | 249 | 249 | 250 |
-| Functions | 43 | 2 | 5 | 1 |
+| Functions | 46 | 2 | 5 | 1 |
 | Fuzzy search | Yes | No | No | No |
 | TypeScript | Full | Partial | Partial | No |
 | Zero deps | Yes | Yes | No | No |
@@ -267,6 +267,21 @@ validatePostalCode(getCountry("US")!, "ABCDE");      // false
 getRandomCountry();                                   // random country
 getRandomCountry(c => c.region === "Europe");         // random European country
 
+// Hemisphere filter
+getCountriesByHemisphere("northern");   // US, India, GB, ... (150+ countries)
+getCountriesByHemisphere("southern");   // Australia, Brazil, South Africa, ...
+
+// Normalize any input to alpha-2 code
+toCountryCode("India");     // "IN"
+toCountryCode("USA");       // "US"
+toCountryCode("356");       // "IN"
+toCountryCode("de");        // "DE"
+
+// Dataset statistics
+getCountryStats();
+// { totalCountries: 250, totalPopulation: 8B+, mostPopulous: { name: "China", ... },
+//   largest: { name: "Russia", ... }, totalLanguages: 150+, totalCurrencies: 160+, ... }
+
 // Sort countries
 sortCountries(getAllCountries(), "population", "desc");   // most populated first
 sortCountries(getAllCountries(), "name", "asc");          // alphabetical
@@ -386,6 +401,9 @@ interface Country {
 | `getAllCurrencies()` | `array` | All currencies with countries |
 | `getAllLanguages()` | `array` | All languages with countries |
 | `getAllTimezones()` | `array` | All timezones with countries |
+| `getCountriesByHemisphere(h)` | `Country[]` | Filter by hemisphere |
+| `toCountryCode(input)` | `string \| undefined` | Normalize any input to alpha-2 |
+| `getCountryStats()` | `CountryStats` | Aggregate dataset statistics |
 | `formatCountry(country)` | `CountrySummary` | Simplified flat output |
 | `validatePostalCode(country, code)` | `boolean` | Validate postal code |
 
@@ -395,7 +413,7 @@ interface Country {
 - **Full TypeScript** — complete type definitions with strict mode
 - **Dual ESM/CJS** — works with `import` and `require()`
 - **Tree-shakable** — `sideEffects: false`, import only what you need
-- **Tiny bundle** — 290 KB total (gzipped ~80 KB)
+- **Tiny bundle** — 257 KB minified (gzipped ~70 KB)
 - **O(1) lookups** — pre-indexed maps for instant resolution (~2.5M ops/sec)
 - **Fuzzy search** — handles typos, partial matches, demonym & currency search
 - **Smart aliases** — "UK", "USA", "UAE", "Holland", "Burma" all resolve correctly
@@ -411,7 +429,7 @@ interface Country {
 - **Random country** — with optional filter predicate
 - **Population/area range filters** — find countries by demographic criteria
 - **`formatCountry()`** — simplified flat output for APIs and forms
-- **138 unit tests** — comprehensive test coverage
+- **148 unit tests** — comprehensive test coverage
 - **Aggregate data** — list all currencies, languages, and timezones with their countries
 - **Sort utility** — sort countries by name, population, area, capital, or region
 - **CI/CD** — GitHub Actions with Node 18, 20, 22
@@ -425,6 +443,22 @@ interface Country {
 - **Educational tools**: Country comparisons, quiz generators, geography data
 - **API backends**: Validate country codes, enrich user data with country info
 - **Internationalization (i18n)**: Language detection, locale mapping
+
+## Performance
+
+| Operation | Speed | Complexity |
+|-----------|-------|-----------|
+| `getCountry()`, `getCountryByAlpha2()`, etc. | ~2.5M ops/sec | O(1) hash map |
+| `getCountryByCapital()`, `getCountryByTLD()` | ~3M ops/sec | O(1) hash map |
+| `searchCountries()` (fuzzy) | ~50K ops/sec | O(n) with pre-extracted index |
+| `filterCountries()` | ~500K ops/sec | O(n) linear scan |
+| `getCountriesByGrouping()` | ~195K ops/sec | O(m) where m = members |
+| `getDistance()` | ~1M ops/sec | O(1) haversine |
+| Bundle size (CJS, minified) | 257 KB | — |
+| Bundle size (gzipped) | ~70 KB | — |
+| Data load (first call) | < 50ms | Lazy initialization |
+
+All lookups use **pre-built hash maps** initialized on first function call. Search uses **pre-extracted and normalized fields** built during data load.
 
 ## Development & Release Workflow
 
@@ -461,7 +495,7 @@ git push origin main --tags
 
 | Action | Command | Result |
 |--------|---------|--------|
-| Run tests | `npm test` | Runs all 138 unit tests |
+| Run tests | `npm test` | Runs all 148 unit tests |
 | Type check | `npm run typecheck` | Validates TypeScript |
 | Build | `npm run build` | Generates dist/ (CJS + ESM) |
 | Push code | `git push origin main` | CI runs (tests only) |

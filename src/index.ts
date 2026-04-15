@@ -44,6 +44,9 @@ export {
   getCountriesByPopulation,
   getCountriesByArea,
   getCountriesByBorderCount,
+  getCountriesByHemisphere,
+  toCountryCode,
+  getCountryStats,
   sortCountries,
   getAllCurrencies,
   getAllLanguages,
@@ -54,7 +57,7 @@ export {
   getClosestCountries,
 } from "./core/utils";
 
-export type { CountrySummary, SortField } from "./core/utils";
+export type { CountrySummary, CountryStats, SortField, Hemisphere } from "./core/utils";
 
 // Types
 export type {

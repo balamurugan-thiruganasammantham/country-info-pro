@@ -1,6 +1,6 @@
 {
   "name": "country-info-pro",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Comprehensive country data for 250 countries with fuzzy search, ISO codes, country groupings (EU, NATO, G7, BRICS, ASEAN), timezone/driving side filters, distance calculator, postal code validation - zero dependencies, full TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
