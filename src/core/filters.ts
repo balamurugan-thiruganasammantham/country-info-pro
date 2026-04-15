@@ -66,6 +66,12 @@ export function filterCountries(options: FilterOptions): Country[] {
       return false;
     if (options.landlocked !== undefined && c.landlocked !== options.landlocked)
       return false;
+    if (options.drivingSide && c.car.side !== options.drivingSide)
+      return false;
+    if (options.timezone) {
+      const tz = options.timezone.toUpperCase();
+      if (!c.timezones.some((t) => t.toUpperCase() === tz)) return false;
+    }
     return true;
   });
 }
@@ -114,4 +120,30 @@ export function getCountriesBySubregion(subregion: string): Country[] {
 export function getCountriesByStartOfWeek(day: string): Country[] {
   const lower = day.toLowerCase();
   return getAll().filter((c) => c.startOfWeek === lower);
+}
+
+/** Returns countries that drive on a given side ("left" or "right"). */
+export function getCountriesByDrivingSide(side: "left" | "right"): Country[] {
+  return getAll().filter((c) => c.car.side === side);
+}
+
+/** Returns countries that share a given timezone (e.g., "UTC+05:30", "UTC-05:00"). Case-insensitive. */
+export function getCountriesByTimezone(timezone: string): Country[] {
+  const tz = timezone.toUpperCase();
+  return getAll().filter((c) =>
+    c.timezones.some((t) => t.toUpperCase() === tz)
+  );
+}
+
+/** Returns a single country matching a phone calling code (e.g., "+91"). Returns the first match. */
+export function getCountryByPhoneCode(code: string): Country | undefined {
+  const cleaned = code.replace(/[^0-9+]/g, "");
+  return getAll().find((c) => {
+    if (!c.idd?.root) return false;
+    if (c.idd.root === cleaned) return true;
+    for (const suffix of c.idd.suffixes) {
+      if (c.idd.root + suffix === cleaned) return true;
+    }
+    return false;
+  });
 }

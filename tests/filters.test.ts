@@ -6,6 +6,8 @@ import {
   getCountriesByCurrency,
   getCountriesByCallingCode,
   getCountriesByGrouping,
+  getCountriesByDrivingSide,
+  getCountriesByTimezone,
   getGroupings,
   getAvailableGroupings,
   filterCountries,
@@ -179,6 +181,59 @@ describe("getGroupings", () => {
     expect(groups).toContain("NATO");
     expect(groups).toContain("G7");
     expect(groups).toContain("SCHENGEN");
+  });
+});
+
+describe("getCountriesByDrivingSide", () => {
+  it("returns left-driving countries", () => {
+    const countries = getCountriesByDrivingSide("left");
+    expect(countries.length).toBeGreaterThan(20);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("IN");
+    expect(codes).toContain("GB");
+    expect(codes).toContain("JP");
+  });
+
+  it("returns right-driving countries", () => {
+    const countries = getCountriesByDrivingSide("right");
+    expect(countries.length).toBeGreaterThan(100);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("US");
+    expect(codes).toContain("FR");
+    expect(codes).toContain("DE");
+  });
+});
+
+describe("getCountriesByTimezone", () => {
+  it("finds countries in UTC+05:30", () => {
+    const countries = getCountriesByTimezone("UTC+05:30");
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("IN");
+    expect(codes).toContain("LK");
+  });
+
+  it("is case-insensitive", () => {
+    const a = getCountriesByTimezone("utc+05:30");
+    const b = getCountriesByTimezone("UTC+05:30");
+    expect(a.length).toBe(b.length);
+  });
+
+  it("returns empty for invalid timezone", () => {
+    expect(getCountriesByTimezone("UTC+99:99")).toEqual([]);
+  });
+});
+
+describe("filterCountries with new options", () => {
+  it("filters by driving side", () => {
+    const countries = filterCountries({ drivingSide: "left", region: "Asia" });
+    expect(countries.length).toBeGreaterThan(3);
+    expect(countries.every((c) => c.car.side === "left")).toBe(true);
+  });
+
+  it("filters by timezone", () => {
+    const countries = filterCountries({ timezone: "UTC+05:30" });
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("IN");
   });
 });
 

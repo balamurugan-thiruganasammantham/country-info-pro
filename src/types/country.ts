@@ -1,7 +1,6 @@
 export interface CountryName {
   common: string;
   official: string;
-  nativeName: Record<string, { official: string; common: string }>;
 }
 
 export interface Currency {
@@ -35,11 +34,6 @@ export interface FlagUrls {
   alt: string;
 }
 
-export interface CoatOfArms {
-  png?: string;
-  svg?: string;
-}
-
 export interface PostalCode {
   format: string;
   regex: string;
@@ -68,9 +62,7 @@ export interface Country {
   cca2: string;
   ccn3: string;
   cca3: string;
-  cioc: string | null;
   independent: boolean | null;
-  status: string;
   unMember: boolean;
   currencies: Record<string, Currency>;
   idd: InternationalDialing;
@@ -93,9 +85,7 @@ export interface Country {
   timezones: string[];
   continents: Continent[];
   flags: FlagUrls;
-  coatOfArms: CoatOfArms;
   startOfWeek: string;
-  capitalInfo: { latlng?: [number, number] };
   postalCode: PostalCode | null;
 }
 
@@ -119,4 +109,6 @@ export interface FilterOptions {
   independent?: boolean;
   unMember?: boolean;
   landlocked?: boolean;
+  drivingSide?: "left" | "right";
+  timezone?: string;
 }

@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-04-15
+
+### Added
+- **Driving side filter**: `getCountriesByDrivingSide("left")` — filter by left/right driving countries
+- **Timezone filter**: `getCountriesByTimezone("UTC+05:30")` — find countries in a specific timezone
+- **Phone code lookup**: `getCountryByPhoneCode("+91")` — single country lookup by calling code
+- `drivingSide` and `timezone` options added to `filterCountries()`
+- Node 22 added to CI matrix
+- npm provenance support for supply chain security
+- Bundle size check in CI (fails if > 500KB)
+- 10 new unit tests (114 total across 5 test files)
+
+### Improved
+- **Bundle size reduced 36%**: 460 KB → 293 KB (stripped nativeName, coatOfArms, capitalInfo, cioc, status fields + minified JSON)
+- **README completely rewritten**: full API reference table (all 34 functions), comparison table, use cases, CommonJS example, SEO keywords
+- **package.json SEO**: expanded to 32 keywords, added engines field
+- Total exported functions: 31 → 34
+
+### Breaking Changes
+- Removed `coatOfArms` field from Country type (rarely used, saved 33KB)
+- Removed `capitalInfo` field from Country type (redundant with `capital` + `latlng`)
+- Removed `cioc` (IOC code) and `status` fields from Country type
+- Removed `nativeName` from `CountryName` type (saved 39KB)
+
 ## [1.2.0] - 2026-03-20
 
 ### Added

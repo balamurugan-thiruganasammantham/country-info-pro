@@ -7,7 +7,6 @@ export type {
   Maps,
   CarInfo,
   FlagUrls,
-  CoatOfArms,
   PostalCode,
   Region,
   Continent,

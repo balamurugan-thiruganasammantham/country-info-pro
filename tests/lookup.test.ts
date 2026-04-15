@@ -7,6 +7,7 @@ import {
   getCountryByName,
   getCountryByCapital,
   getCountryByTLD,
+  getCountryByPhoneCode,
   getPhoneCode,
   getCurrencyInfo,
   isValidCountryCode,
@@ -222,6 +223,25 @@ describe("isValidCountryCode", () => {
   it("returns false for non-code strings", () => {
     expect(isValidCountryCode("India")).toBe(false);
     expect(isValidCountryCode("123")).toBe(false);
+  });
+});
+
+describe("getCountryByPhoneCode", () => {
+  it("finds India by +91", () => {
+    const country = getCountryByPhoneCode("+91");
+    expect(country).toBeDefined();
+    expect(country!.cca2).toBe("IN");
+  });
+
+  it("finds a country by +1", () => {
+    const country = getCountryByPhoneCode("+1");
+    expect(country).toBeDefined();
+    // +1 is shared by US, Canada, and Caribbean nations
+    expect(country!.idd.root).toBe("+1");
+  });
+
+  it("returns undefined for invalid code", () => {
+    expect(getCountryByPhoneCode("+999999")).toBeUndefined();
   });
 });
 
