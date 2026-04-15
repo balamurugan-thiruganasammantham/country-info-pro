@@ -55,11 +55,11 @@
 - [x] Contributing guide
 - [ ] Code examples in JSDoc
 - [ ] Interactive API playground (StackBlitz / CodeSandbox)
-- [ ] Benchmark results in README
+- [x] Benchmark results in README
 
 ## Competitive Advantages
 
-1. **43 exported functions** — most comprehensive API in the ecosystem
+1. **46 exported functions** — most comprehensive API in the ecosystem
 2. **18 country groupings** — no competitor offers this
 3. **Haversine distance + geoproximity** — unique feature
 4. **Postal code validation** — unique feature

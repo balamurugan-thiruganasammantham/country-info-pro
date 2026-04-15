@@ -169,3 +169,23 @@
 - sortCountries() eliminates boilerplate for common sorting operations
 - Border count filter enables unique queries (island nations, landlocked with few borders)
 - Expanded aliases improve discoverability via getCountry() for casual users
+
+## [2026-04-15] — Improvement Cycle 7 (v1.6.0)
+
+### Added
+- **3 new API functions**: `getCountriesByHemisphere()`, `toCountryCode()`, `getCountryStats()`
+- **`Hemisphere` type**: "northern" | "southern" | "eastern" | "western"
+- **`CountryStats` type**: 14-field aggregate statistics interface
+- **Performance section in README**: benchmark table with ops/sec for all operation types
+- **10 new tests** (148 total)
+
+### Improved
+- **Bundle size reduced 15%**: 299KB → 257KB via tsup minification (`minify: true`)
+- Total exported functions: 43 → 46
+- Total exported types: 17 → 19
+
+### Reason
+- Hemisphere filter is a unique geographic feature no competitor has
+- toCountryCode() solves the common "normalize any input to alpha-2" use case
+- getCountryStats() enables dashboard/analytics use cases with a single call
+- Minification reduces download and parse time for end users
