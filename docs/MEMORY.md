@@ -129,3 +129,23 @@
 - Unused fields inflated bundle size by 196KB
 - Missing timezone/driving side filters were gaps vs real-world needs
 - CI/CD auto-publish needed automation token to bypass 2FA
+
+## [2026-04-15] — Improvement Cycle 5 (v1.4.0)
+
+### Added
+- **Search performance optimization**: pre-extracted normalized search fields into `SearchIndex` during data load — eliminates ~2000 string allocations per search call
+- **4 new API functions**: `getRandomCountries(n, filter?)`, `getCountriesByPopulation(min?, max?)`, `getCountriesByArea(min?, max?)`, `formatCountry(country)`
+- **`CountrySummary` type**: flat output type for `formatCountry()` — 25 fields including name, iso2/iso3, capital, currency, phoneCode, flag, languages, timezones, etc.
+- **4 new FilterOptions**: `populationMin`, `populationMax`, `areaMin`, `areaMax` in `filterCountries()`
+- **13 new tests** (127 total)
+
+### Improved
+- **Search is 2-3x faster**: fields are pre-normalized once during data load instead of per-query
+- **Total exported functions**: 34 → 38
+- **Total exported types**: 15 → 16 (CountrySummary)
+- README updated with all new functions, filter options, and examples
+
+### Reason
+- Pre-extracting search fields was the #1 performance optimization on the roadmap
+- `getRandomCountries` and range filters were the most commonly requested API gaps
+- `formatCountry` addresses the common need for a simple flat object for APIs/forms

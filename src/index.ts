@@ -40,10 +40,16 @@ export {
   toEmojiFlag,
   getDistance,
   getRandomCountry,
+  getRandomCountries,
+  getCountriesByPopulation,
+  getCountriesByArea,
+  formatCountry,
   compareCountries,
   validatePostalCode,
   getClosestCountries,
 } from "./core/utils";
+
+export type { CountrySummary } from "./core/utils";
 
 // Types
 export type {

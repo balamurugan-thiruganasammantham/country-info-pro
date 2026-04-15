@@ -4,6 +4,11 @@ import {
   toEmojiFlag,
   getDistance,
   getRandomCountry,
+  getRandomCountries,
+  getCountriesByPopulation,
+  getCountriesByArea,
+  formatCountry,
+  filterCountries,
   compareCountries,
   validatePostalCode,
   getClosestCountries,
@@ -161,6 +166,129 @@ describe("getClosestCountries", () => {
     const closest = getClosestCountries(us, 1);
     expect(closest[0].distance).toBeGreaterThan(0);
     expect(typeof closest[0].distance).toBe("number");
+  });
+});
+
+describe("getRandomCountries", () => {
+  it("returns the requested number of countries", () => {
+    const countries = getRandomCountries(5);
+    expect(countries).toHaveLength(5);
+  });
+
+  it("returns unique countries", () => {
+    const countries = getRandomCountries(10);
+    const codes = countries.map((c) => c.cca2);
+    expect(new Set(codes).size).toBe(10);
+  });
+
+  it("respects filter predicate", () => {
+    const countries = getRandomCountries(3, (c) => c.region === "Europe");
+    expect(countries).toHaveLength(3);
+    expect(countries.every((c) => c.region === "Europe")).toBe(true);
+  });
+
+  it("returns all if count exceeds pool", () => {
+    const countries = getRandomCountries(999, (c) => c.cca2 === "IN");
+    expect(countries).toHaveLength(1);
+    expect(countries[0].cca2).toBe("IN");
+  });
+});
+
+describe("getCountriesByPopulation", () => {
+  it("returns countries above minimum population", () => {
+    const countries = getCountriesByPopulation(1_000_000_000);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("IN");
+    expect(codes).toContain("CN");
+    expect(countries.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("returns countries in population range", () => {
+    const countries = getCountriesByPopulation(50_000_000, 100_000_000);
+    expect(countries.length).toBeGreaterThan(5);
+    expect(countries.every((c) => c.population >= 50_000_000 && c.population <= 100_000_000)).toBe(true);
+  });
+
+  it("returns all with no limits", () => {
+    const countries = getCountriesByPopulation();
+    expect(countries.length).toBe(250);
+  });
+});
+
+describe("getCountriesByArea", () => {
+  it("returns large countries", () => {
+    const countries = getCountriesByArea(5_000_000);
+    const codes = countries.map((c) => c.cca2);
+    expect(codes).toContain("RU");
+    expect(codes).toContain("CN");
+    expect(codes).toContain("US");
+  });
+
+  it("returns small countries", () => {
+    const countries = getCountriesByArea(0, 1000);
+    expect(countries.length).toBeGreaterThan(10);
+    expect(countries.every((c) => c.area <= 1000)).toBe(true);
+  });
+});
+
+describe("formatCountry", () => {
+  it("returns a flat summary for India", () => {
+    const india = getCountry("IN")!;
+    const summary = formatCountry(india);
+
+    expect(summary.name).toBe("India");
+    expect(summary.officialName).toBe("Republic of India");
+    expect(summary.iso2).toBe("IN");
+    expect(summary.iso3).toBe("IND");
+    expect(summary.numericCode).toBe("356");
+    expect(summary.capital).toBe("New Delhi");
+    expect(summary.region).toBe("Asia");
+    expect(summary.subregion).toBe("Southern Asia");
+    expect(summary.continent).toBe("Asia");
+    expect(summary.population).toBeGreaterThan(0);
+    expect(summary.area).toBeGreaterThan(0);
+    expect(summary.currency).toBeDefined();
+    expect(summary.currency!.code).toBe("INR");
+    expect(summary.currency!.symbol).toBe("₹");
+    expect(summary.phoneCode).toBe("+91");
+    expect(summary.flag).toBe("🇮🇳");
+    expect(summary.flagUrl).toContain("flagcdn.com");
+    expect(summary.mapUrl).toContain("google");
+    expect(summary.languages).toContain("Hindi");
+    expect(summary.timezones).toContain("UTC+05:30");
+    expect(summary.borders).toContain("PAK");
+    expect(summary.drivingSide).toBe("left");
+    expect(summary.tld).toBe(".in");
+    expect(summary.landlocked).toBe(false);
+    expect(summary.independent).toBe(true);
+    expect(summary.latlng).toHaveLength(2);
+  });
+
+  it("handles country without currency", () => {
+    const aq = getCountry("AQ")!; // Antarctica
+    const summary = formatCountry(aq);
+    expect(summary.name).toBe("Antarctica");
+    expect(summary.currency).toBeNull();
+  });
+});
+
+describe("filterCountries with population/area ranges", () => {
+  it("filters by population range", () => {
+    const countries = filterCountries({
+      populationMin: 100_000_000,
+      region: "Asia",
+    });
+    expect(countries.length).toBeGreaterThan(2);
+    expect(countries.every((c) => c.population >= 100_000_000 && c.region === "Asia")).toBe(true);
+  });
+
+  it("filters by area range", () => {
+    const countries = filterCountries({
+      areaMax: 500,
+      independent: true,
+    });
+    expect(countries.length).toBeGreaterThan(0);
+    expect(countries.every((c) => c.area <= 500)).toBe(true);
   });
 });
 

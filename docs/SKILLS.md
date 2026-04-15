@@ -89,6 +89,27 @@
 - Wrapped in try/catch for malformed regex safety
 - Returns `false` for countries without postal codes
 
+## Pre-extracted Search Index (`src/utils/loader.ts`)
+
+- `SearchIndex` built once during `ensureLoaded()` alongside lookup maps
+- Each entry pre-normalizes: `commonName`, `officialName`, `cca2`, `cca3`, `altSpellings`, `capitals`, `demonyms`, `currencyNames`
+- Currency names split into individual words (3+ chars) for partial matching
+- Eliminates ~2000 `normalize()` calls per `searchCountries()` invocation
+- Search module reads from index directly — no per-query allocations
+
+## Fisher-Yates Shuffle (`src/core/utils.ts`)
+
+- Partial Fisher-Yates for `getRandomCountries(n)` — only shuffles first `n` elements
+- O(n) time, O(1) extra space
+- Guarantees unique results without Set-based deduplication
+
+## Simplified Output Pattern (`formatCountry`)
+
+- Flattens nested Country structure into a 25-field `CountrySummary`
+- Extracts primary currency (first entry), primary capital, primary TLD, primary continent
+- Formats phone code inline (root + suffix for single-suffix countries)
+- Returns `null` for missing optional fields (currency, capital) instead of `undefined`
+
 ## Build & Distribution
 
 - tsup for dual ESM/CJS output with declaration files

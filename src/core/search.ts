@@ -1,11 +1,11 @@
 import type { Country, SearchResult, SearchOptions } from "../types";
-import { getAll } from "../utils/loader";
+import { getSearchIndex } from "../utils/loader";
 import { normalize } from "../utils/normalize";
 import { fuzzyScore } from "../utils/fuzzy";
 
 interface FieldConfig {
   weight: number;
-  extract: (country: Country) => string[];
+  extract: (idx: import("../utils/loader").SearchIndex) => string[];
   label: string;
   minQueryLen?: number;
 }
@@ -13,66 +13,50 @@ interface FieldConfig {
 const SEARCH_FIELDS: FieldConfig[] = [
   {
     weight: 1.0,
-    extract: (c) => [c.name.common],
+    extract: (idx) => [idx.commonName],
     label: "name.common",
   },
   {
     weight: 0.9,
-    extract: (c) => [c.name.official],
+    extract: (idx) => [idx.officialName],
     label: "name.official",
   },
   {
     weight: 0.95,
-    extract: (c) => [c.cca2],
+    extract: (idx) => [idx.cca2],
     label: "cca2",
     minQueryLen: 2,
   },
   {
     weight: 0.95,
-    extract: (c) => [c.cca3],
+    extract: (idx) => [idx.cca3],
     label: "cca3",
     minQueryLen: 2,
   },
   {
     weight: 0.8,
-    extract: (c) => c.altSpellings,
+    extract: (idx) => idx.altSpellings,
     label: "altSpellings",
   },
   {
     weight: 0.7,
-    extract: (c) => c.capital,
+    extract: (idx) => idx.capitals,
     label: "capital",
   },
   {
     weight: 0.75,
-    extract: (c) => {
-      const demonyms = c.demonyms?.eng;
-      if (!demonyms) return [];
-      return [demonyms.m, demonyms.f].filter(Boolean);
-    },
+    extract: (idx) => idx.demonyms,
     label: "demonym",
   },
   {
     weight: 0.65,
-    extract: (c) => {
-      const names: string[] = [];
-      for (const cur of Object.values(c.currencies)) {
-        if (cur.name) {
-          names.push(cur.name);
-          // Also add individual words for better partial matching
-          // ("rupee" should match "Indian rupee")
-          for (const word of cur.name.split(/\s+/)) {
-            if (word.length >= 3) names.push(word);
-          }
-        }
-      }
-      return names;
-    },
+    extract: (idx) => idx.currencyNames,
     label: "currency",
     minQueryLen: 3,
   },
 ];
 
+/** Fuzzy search across country names, codes, capitals, demonyms, and currencies. Returns scored results. */
 export function searchCountries(
   query: string,
   options: SearchOptions = {}
@@ -82,10 +66,10 @@ export function searchCountries(
   if (!trimmed) return [];
 
   const normalizedQuery = normalize(trimmed);
-  const countries = getAll();
+  const index = getSearchIndex();
   const results: SearchResult[] = [];
 
-  for (const country of countries) {
+  for (const entry of index) {
     let bestScore = 0;
     let bestField = "";
 
@@ -94,16 +78,15 @@ export function searchCountries(
         continue;
       }
 
-      const values = field.extract(country);
+      const values = field.extract(entry);
       for (const value of values) {
         if (!value) continue;
-        const normalizedValue = normalize(value);
-        const score = fuzzyScore(normalizedQuery, normalizedValue) * field.weight;
+        // Values are already normalized during data load
+        const score = fuzzyScore(normalizedQuery, value) * field.weight;
         if (score > bestScore) {
           bestScore = score;
           bestField = field.label;
         }
-        // Early exit: perfect match on this country, no need to check more fields
         if (bestScore >= 1.0) break;
       }
       if (bestScore >= 1.0) break;
@@ -111,7 +94,7 @@ export function searchCountries(
 
     if (bestScore >= threshold) {
       results.push({
-        country,
+        country: entry.country,
         score: bestScore,
         matchedOn: bestField,
       });

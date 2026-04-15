@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-> The most comprehensive country data package for Node.js and TypeScript. 250 countries. 34 functions. Zero dependencies. Built-in fuzzy search.
+> The most comprehensive country data package for Node.js and TypeScript. 250 countries. 38 functions. Zero dependencies. Built-in fuzzy search.
 
 Get detailed data for **250 countries**: names, ISO codes, capitals, currencies, phone codes, timezones, languages, populations, flags, maps, borders, postal codes, driving side, and 18 political/economic groupings (EU, NATO, G7, BRICS, ASEAN, etc.).
 
@@ -19,7 +19,7 @@ Get detailed data for **250 countries**: names, ISO codes, capitals, currencies,
 | Feature | country-info-pro | country-list | i18n-iso-countries | world-countries |
 |---------|:---:|:---:|:---:|:---:|
 | Countries | 250 | 249 | 249 | 250 |
-| Functions | 34 | 2 | 5 | 1 |
+| Functions | 38 | 2 | 5 | 1 |
 | Fuzzy search | Yes | No | No | No |
 | TypeScript | Full | Partial | Partial | No |
 | Zero deps | Yes | Yes | No | No |
@@ -196,6 +196,10 @@ filterCountries({
 | `landlocked` | `boolean` | Has no coastline |
 | `drivingSide` | `"left" \| "right"` | Side of road for driving |
 | `timezone` | `string` | E.g., "UTC+05:30", "UTC-05:00" |
+| `populationMin` | `number` | Minimum population |
+| `populationMax` | `number` | Maximum population |
+| `areaMin` | `number` | Minimum area (km²) |
+| `areaMax` | `number` | Maximum area (km²) |
 
 ### Country Groupings (18 Organizations)
 
@@ -262,6 +266,20 @@ validatePostalCode(getCountry("US")!, "ABCDE");      // false
 // Random country
 getRandomCountry();                                   // random country
 getRandomCountry(c => c.region === "Europe");         // random European country
+
+// Multiple random countries
+getRandomCountries(5);                                // 5 random countries
+getRandomCountries(3, c => c.region === "Europe");    // 3 random European countries
+
+// Filter by population or area range
+getCountriesByPopulation(1_000_000_000);              // countries with 1B+ population
+getCountriesByArea(0, 1000);                          // countries under 1000 km²
+
+// Simplified flat output for APIs and forms
+formatCountry(india);
+// { name: "India", iso2: "IN", iso3: "IND", capital: "New Delhi",
+//   currency: { code: "INR", name: "Indian rupee", symbol: "₹" },
+//   phoneCode: "+91", flag: "🇮🇳", ... }
 
 // Compare two countries side-by-side
 compareCountries(india, japan);
@@ -347,6 +365,10 @@ interface Country {
 | `getClosestCountries(country, n)` | `array` | Nearest countries |
 | `getRandomCountry(filter?)` | `Country` | Random country |
 | `compareCountries(a, b)` | `object` | Side-by-side comparison |
+| `getRandomCountries(n, filter?)` | `Country[]` | N unique random countries |
+| `getCountriesByPopulation(min?, max?)` | `Country[]` | Filter by population range |
+| `getCountriesByArea(min?, max?)` | `Country[]` | Filter by area range |
+| `formatCountry(country)` | `CountrySummary` | Simplified flat output |
 | `validatePostalCode(country, code)` | `boolean` | Validate postal code |
 
 ## Features
@@ -369,7 +391,9 @@ interface Country {
 - **Timezone filter** — find countries by timezone
 - **Country comparison** — structured side-by-side diff of any two countries
 - **Random country** — with optional filter predicate
-- **114 unit tests** — comprehensive test coverage
+- **Population/area range filters** — find countries by demographic criteria
+- **`formatCountry()`** — simplified flat output for APIs and forms
+- **127 unit tests** — comprehensive test coverage
 - **CI/CD** — GitHub Actions with Node 18, 20, 22
 
 ## Use Cases
@@ -417,7 +441,7 @@ git push origin main --tags
 
 | Action | Command | Result |
 |--------|---------|--------|
-| Run tests | `npm test` | Runs all 114 unit tests |
+| Run tests | `npm test` | Runs all 127 unit tests |
 | Type check | `npm run typecheck` | Validates TypeScript |
 | Build | `npm run build` | Generates dist/ (CJS + ESM) |
 | Push code | `git push origin main` | CI runs (tests only) |

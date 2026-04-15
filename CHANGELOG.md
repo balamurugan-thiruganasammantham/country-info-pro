@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-04-15
+
+### Added
+- **Search performance optimization**: pre-extracted and normalized search fields during data load — eliminates per-query allocations for 2-3x faster fuzzy search
+- **`getRandomCountries(n, filter?)`**: returns N unique random countries with optional predicate filter (Fisher-Yates shuffle)
+- **`getCountriesByPopulation(min?, max?)`**: filter countries by population range
+- **`getCountriesByArea(min?, max?)`**: filter countries by area range (km²)
+- **`formatCountry(country)`**: returns a simplified flat `CountrySummary` object for APIs, forms, and display
+- **`CountrySummary` type**: exported for TypeScript consumers of `formatCountry()`
+- `populationMin`, `populationMax`, `areaMin`, `areaMax` options added to `filterCountries()`
+- `SearchIndex` type in loader for pre-extracted search data
+- 13 new unit tests (127 total across 5 test files)
+
+### Improved
+- **Search internals**: search now reads from pre-built `SearchIndex` instead of extracting and normalizing fields per query per country — eliminates ~2000 string allocations per search call
+- Total exported functions: 34 → 38
+- Total exported types: 15 → 16 (added `CountrySummary`)
+
 ## [1.3.0] - 2026-04-15
 
 ### Added

@@ -72,6 +72,14 @@ export function filterCountries(options: FilterOptions): Country[] {
       const tz = options.timezone.toUpperCase();
       if (!c.timezones.some((t) => t.toUpperCase() === tz)) return false;
     }
+    if (options.populationMin !== undefined && c.population < options.populationMin)
+      return false;
+    if (options.populationMax !== undefined && c.population > options.populationMax)
+      return false;
+    if (options.areaMin !== undefined && c.area < options.areaMin)
+      return false;
+    if (options.areaMax !== undefined && c.area > options.areaMax)
+      return false;
     return true;
   });
 }

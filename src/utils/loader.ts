@@ -1,5 +1,19 @@
 import type { Country } from "../types";
+import { normalize } from "./normalize";
 import countriesData from "../data/countries.json";
+
+/** Pre-extracted and normalized search fields for a single country. */
+export interface SearchIndex {
+  country: Country;
+  commonName: string;
+  officialName: string;
+  cca2: string;
+  cca3: string;
+  altSpellings: string[];
+  capitals: string[];
+  demonyms: string[];
+  currencyNames: string[];
+}
 
 let countries: Country[] | null = null;
 let alpha2Map: Map<string, Country> | null = null;
@@ -8,6 +22,7 @@ let numericMap: Map<string, Country> | null = null;
 let nameMap: Map<string, Country> | null = null;
 let capitalMap: Map<string, Country> | null = null;
 let tldMap: Map<string, Country> | null = null;
+let searchIndex: SearchIndex[] | null = null;
 
 function ensureLoaded(): void {
   if (countries !== null) return;
@@ -19,6 +34,7 @@ function ensureLoaded(): void {
   nameMap = new Map();
   capitalMap = new Map();
   tldMap = new Map();
+  searchIndex = [];
 
   for (const country of countries) {
     if (country.cca2) {
@@ -42,6 +58,36 @@ function ensureLoaded(): void {
     for (const domain of country.tld) {
       tldMap.set(domain.toLowerCase(), country);
     }
+
+    // Pre-extract and normalize search fields once
+    const demonyms = country.demonyms?.eng;
+    const demonymList: string[] = [];
+    if (demonyms) {
+      if (demonyms.m) demonymList.push(normalize(demonyms.m));
+      if (demonyms.f && demonyms.f !== demonyms.m) demonymList.push(normalize(demonyms.f));
+    }
+
+    const currencyNames: string[] = [];
+    for (const cur of Object.values(country.currencies)) {
+      if (cur.name) {
+        currencyNames.push(normalize(cur.name));
+        for (const word of cur.name.split(/\s+/)) {
+          if (word.length >= 3) currencyNames.push(normalize(word));
+        }
+      }
+    }
+
+    searchIndex.push({
+      country,
+      commonName: normalize(country.name.common),
+      officialName: normalize(country.name.official),
+      cca2: normalize(country.cca2),
+      cca3: normalize(country.cca3),
+      altSpellings: country.altSpellings.map(normalize),
+      capitals: country.capital.map(normalize),
+      demonyms: demonymList,
+      currencyNames,
+    });
   }
 }
 
@@ -79,4 +125,9 @@ export function byTLD(tld: string): Country | undefined {
   ensureLoaded();
   const normalized = tld.startsWith(".") ? tld.toLowerCase() : "." + tld.toLowerCase();
   return tldMap!.get(normalized);
+}
+
+export function getSearchIndex(): SearchIndex[] {
+  ensureLoaded();
+  return searchIndex!;
 }

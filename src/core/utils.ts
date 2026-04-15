@@ -108,3 +108,124 @@ export function getClosestCountries(
   distances.sort((a, b) => a.distance - b.distance);
   return distances.slice(0, count);
 }
+
+/**
+ * Returns N random countries. Optionally filter by a predicate.
+ * If n exceeds available countries, returns all matching countries (shuffled).
+ */
+export function getRandomCountries(
+  count: number,
+  filter?: (country: Country) => boolean
+): Country[] {
+  const pool = filter ? getAll().filter(filter) : [...getAll()];
+  const n = Math.min(count, pool.length);
+  // Fisher-Yates shuffle (partial — only shuffle first n elements)
+  for (let i = 0; i < n; i++) {
+    const j = i + Math.floor(Math.random() * (pool.length - i));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, n);
+}
+
+/**
+ * Returns countries with population in the given range (inclusive).
+ * Omit min or max for open-ended ranges.
+ */
+export function getCountriesByPopulation(
+  min?: number,
+  max?: number
+): Country[] {
+  return getAll().filter((c) => {
+    if (min !== undefined && c.population < min) return false;
+    if (max !== undefined && c.population > max) return false;
+    return true;
+  });
+}
+
+/**
+ * Returns countries with area (km²) in the given range (inclusive).
+ * Omit min or max for open-ended ranges.
+ */
+export function getCountriesByArea(
+  min?: number,
+  max?: number
+): Country[] {
+  return getAll().filter((c) => {
+    if (min !== undefined && c.area < min) return false;
+    if (max !== undefined && c.area > max) return false;
+    return true;
+  });
+}
+
+/** Simplified country summary for common use cases. */
+export interface CountrySummary {
+  name: string;
+  officialName: string;
+  iso2: string;
+  iso3: string;
+  numericCode: string;
+  capital: string;
+  region: string;
+  subregion: string;
+  continent: string;
+  population: number;
+  area: number;
+  currency: { code: string; name: string; symbol: string } | null;
+  phoneCode: string;
+  flag: string;
+  flagUrl: string;
+  mapUrl: string;
+  languages: string[];
+  timezones: string[];
+  borders: string[];
+  drivingSide: string;
+  tld: string;
+  landlocked: boolean;
+  independent: boolean | null;
+  latlng: [number, number];
+}
+
+/**
+ * Returns a simplified flat object with the most commonly needed country fields.
+ * Useful for APIs, forms, and display purposes.
+ */
+export function formatCountry(country: Country): CountrySummary {
+  const currencyEntries = Object.entries(country.currencies);
+  const currency = currencyEntries.length > 0
+    ? { code: currencyEntries[0][0], ...currencyEntries[0][1] }
+    : null;
+
+  let phoneCode = "";
+  if (country.idd?.root) {
+    phoneCode = country.idd.suffixes.length === 1
+      ? country.idd.root + country.idd.suffixes[0]
+      : country.idd.root;
+  }
+
+  return {
+    name: country.name.common,
+    officialName: country.name.official,
+    iso2: country.cca2,
+    iso3: country.cca3,
+    numericCode: country.ccn3,
+    capital: country.capital[0] ?? "",
+    region: country.region,
+    subregion: country.subregion,
+    continent: country.continents[0] ?? "",
+    population: country.population,
+    area: country.area,
+    currency,
+    phoneCode,
+    flag: country.flag,
+    flagUrl: country.flags.svg,
+    mapUrl: country.maps.googleMaps,
+    languages: Object.values(country.languages),
+    timezones: country.timezones,
+    borders: country.borders,
+    drivingSide: country.car.side,
+    tld: country.tld[0] ?? "",
+    landlocked: country.landlocked,
+    independent: country.independent,
+    latlng: country.latlng,
+  };
+}

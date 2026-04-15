@@ -111,4 +111,8 @@ export interface FilterOptions {
   landlocked?: boolean;
   drivingSide?: "left" | "right";
   timezone?: string;
+  populationMin?: number;
+  populationMax?: number;
+  areaMin?: number;
+  areaMax?: number;
 }

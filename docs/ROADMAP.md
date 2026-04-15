@@ -28,15 +28,16 @@
 ## Next Up
 
 ### Performance
-- [ ] Pre-extract search field values during data load (avoid per-search allocations)
+- [x] Pre-extract search field values during data load (avoid per-search allocations)
 - [ ] Add memoization for repeated filter calls with same args
 - [ ] Compress JSON data further (abbreviate long field names at build time)
 
-### API Gaps
-- [ ] `getRandomCountries(n, filter?)` returning multiple random countries
-- [ ] `getCountriesByPopulation(min, max)` range filter
-- [ ] `getCountriesByArea(min, max)` range filter
-- [ ] `formatCountry(country)` — returns a simplified flat object for common use cases
+### API (Done in v1.4.0)
+- [x] `getRandomCountries(n, filter?)` returning multiple random countries
+- [x] `getCountriesByPopulation(min, max)` range filter
+- [x] `getCountriesByArea(min, max)` range filter
+- [x] `formatCountry(country)` — simplified flat `CountrySummary` output
+- [x] `populationMin/Max`, `areaMin/Max` added to `filterCountries()`
 
 ### Data
 - [ ] Add GINI index data where available
@@ -58,7 +59,7 @@
 
 ## Competitive Advantages
 
-1. **34 exported functions** — most comprehensive API in the ecosystem
+1. **38 exported functions** — most comprehensive API in the ecosystem
 2. **18 country groupings** — no competitor offers this
 3. **Haversine distance + geoproximity** — unique feature
 4. **Postal code validation** — unique feature
