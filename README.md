@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-> The most comprehensive country data package for Node.js and TypeScript. 250 countries. 38 functions. Zero dependencies. Built-in fuzzy search.
+> The most comprehensive country data package for Node.js and TypeScript. 250 countries. 43 functions. Zero dependencies. Built-in fuzzy search.
 
 Get detailed data for **250 countries**: names, ISO codes, capitals, currencies, phone codes, timezones, languages, populations, flags, maps, borders, postal codes, driving side, and 18 political/economic groupings (EU, NATO, G7, BRICS, ASEAN, etc.).
 
@@ -19,7 +19,7 @@ Get detailed data for **250 countries**: names, ISO codes, capitals, currencies,
 | Feature | country-info-pro | country-list | i18n-iso-countries | world-countries |
 |---------|:---:|:---:|:---:|:---:|
 | Countries | 250 | 249 | 249 | 250 |
-| Functions | 38 | 2 | 5 | 1 |
+| Functions | 43 | 2 | 5 | 1 |
 | Fuzzy search | Yes | No | No | No |
 | TypeScript | Full | Partial | Partial | No |
 | Zero deps | Yes | Yes | No | No |
@@ -267,6 +267,19 @@ validatePostalCode(getCountry("US")!, "ABCDE");      // false
 getRandomCountry();                                   // random country
 getRandomCountry(c => c.region === "Europe");         // random European country
 
+// Sort countries
+sortCountries(getAllCountries(), "population", "desc");   // most populated first
+sortCountries(getAllCountries(), "name", "asc");          // alphabetical
+
+// Aggregate data
+getAllCurrencies();    // [{ code: "USD", name: "United States dollar", symbol: "$", countries: ["US", ...] }, ...]
+getAllLanguages();     // [{ code: "eng", name: "English", countries: ["US", "GB", "AU", ...] }, ...]
+getAllTimezones();     // [{ timezone: "UTC+05:30", countries: ["IN", "LK"] }, ...]
+
+// Border count filter
+getCountriesByBorderCount(0);   // island nations (Japan, Australia, ...)
+getCountriesByBorderCount(1);   // countries with 1 border (Portugal, ...)
+
 // Multiple random countries
 getRandomCountries(5);                                // 5 random countries
 getRandomCountries(3, c => c.region === "Europe");    // 3 random European countries
@@ -368,6 +381,11 @@ interface Country {
 | `getRandomCountries(n, filter?)` | `Country[]` | N unique random countries |
 | `getCountriesByPopulation(min?, max?)` | `Country[]` | Filter by population range |
 | `getCountriesByArea(min?, max?)` | `Country[]` | Filter by area range |
+| `getCountriesByBorderCount(count)` | `Country[]` | Filter by border count |
+| `sortCountries(countries, field, order)` | `Country[]` | Sort by name/population/area |
+| `getAllCurrencies()` | `array` | All currencies with countries |
+| `getAllLanguages()` | `array` | All languages with countries |
+| `getAllTimezones()` | `array` | All timezones with countries |
 | `formatCountry(country)` | `CountrySummary` | Simplified flat output |
 | `validatePostalCode(country, code)` | `boolean` | Validate postal code |
 
@@ -393,7 +411,9 @@ interface Country {
 - **Random country** — with optional filter predicate
 - **Population/area range filters** — find countries by demographic criteria
 - **`formatCountry()`** — simplified flat output for APIs and forms
-- **127 unit tests** — comprehensive test coverage
+- **138 unit tests** — comprehensive test coverage
+- **Aggregate data** — list all currencies, languages, and timezones with their countries
+- **Sort utility** — sort countries by name, population, area, capital, or region
 - **CI/CD** — GitHub Actions with Node 18, 20, 22
 
 ## Use Cases
@@ -441,7 +461,7 @@ git push origin main --tags
 
 | Action | Command | Result |
 |--------|---------|--------|
-| Run tests | `npm test` | Runs all 127 unit tests |
+| Run tests | `npm test` | Runs all 138 unit tests |
 | Type check | `npm run typecheck` | Validates TypeScript |
 | Build | `npm run build` | Generates dist/ (CJS + ESM) |
 | Push code | `git push origin main` | CI runs (tests only) |

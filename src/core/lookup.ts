@@ -1,39 +1,78 @@
 import type { Country } from "../types";
 import { byAlpha2, byAlpha3, byNumeric, byName, byCapital, byTLD } from "../utils/loader";
 
-/** Common abbreviations/aliases mapped to alpha-2 codes */
+/** Common abbreviations/aliases mapped to alpha-2 codes (50+ entries) */
 const ALIASES: Record<string, string> = {
+  // English-speaking aliases
   uk: "GB",
   england: "GB",
   britain: "GB",
   "great britain": "GB",
+  "united kingdom": "GB",
+  scotland: "GB",
+  wales: "GB",
   usa: "US",
   america: "US",
+  "united states": "US",
+  "united states of america": "US",
   uae: "AE",
+  emirates: "AE",
+
+  // Regional common names
   korea: "KR",
   "south korea": "KR",
   "north korea": "KP",
   russia: "RU",
+  "soviet union": "RU",
   taiwan: "TW",
+  china: "CN",
+  "mainland china": "CN",
+  "hong kong": "HK",
   czech: "CZ",
   czechia: "CZ",
-  "ivory coast": "CI",
+  "czech republic": "CZ",
   holland: "NL",
+  "the netherlands": "NL",
+  netherlands: "NL",
+
+  // Historical / alternate names
+  "ivory coast": "CI",
   burma: "MM",
+  myanmar: "MM",
   persia: "IR",
+  iran: "IR",
   siam: "TH",
-  "congo": "CD",
+  thailand: "TH",
+  congo: "CD",
   "dr congo": "CD",
-  "drc": "CD",
+  drc: "CD",
   "east timor": "TL",
-  "vatican": "VA",
+  "timor leste": "TL",
+  vatican: "VA",
   "holy see": "VA",
-  "palestine": "PS",
-  "macedonia": "MK",
-  "eswatini": "SZ",
-  "swaziland": "SZ",
+  palestine: "PS",
+  macedonia: "MK",
+  "north macedonia": "MK",
+  eswatini: "SZ",
+  swaziland: "SZ",
   "cabo verde": "CV",
   "cape verde": "CV",
+
+  // Additional common abbreviations
+  rok: "KR",
+  dprk: "KP",
+  prc: "CN",
+  rsa: "ZA",
+  "south africa": "ZA",
+  ksa: "SA",
+  saudi: "SA",
+  "saudi arabia": "SA",
+  nz: "NZ",
+  "new zealand": "NZ",
+  "cote divoire": "CI",
+  bosnia: "BA",
+  trinidad: "TT",
+  tobago: "TT",
 };
 
 /** Finds a country by its ISO 3166-1 alpha-2 code (e.g., "US", "IN"). Case-insensitive. */

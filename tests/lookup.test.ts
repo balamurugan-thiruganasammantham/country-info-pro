@@ -119,6 +119,21 @@ describe("getCountry (smart lookup)", () => {
     expect(getCountry("Burma")!.cca2).toBe("MM");
     expect(getCountry("UAE")!.cca2).toBe("AE");
   });
+
+  it("resolves expanded aliases", () => {
+    expect(getCountry("England")!.cca2).toBe("GB");
+    expect(getCountry("Scotland")!.cca2).toBe("GB");
+    expect(getCountry("Emirates")!.cca2).toBe("AE");
+    expect(getCountry("Czech Republic")!.cca2).toBe("CZ");
+    expect(getCountry("South Africa")!.cca2).toBe("ZA");
+    expect(getCountry("RSA")!.cca2).toBe("ZA");
+    expect(getCountry("Saudi")!.cca2).toBe("SA");
+    expect(getCountry("NZ")!.cca2).toBe("NZ");
+    expect(getCountry("Hong Kong")!.cca2).toBe("HK");
+    expect(getCountry("DPRK")!.cca2).toBe("KP");
+    expect(getCountry("Trinidad")!.cca2).toBe("TT");
+    expect(getCountry("Bosnia")!.cca2).toBe("BA");
+  });
 });
 
 describe("country data completeness", () => {

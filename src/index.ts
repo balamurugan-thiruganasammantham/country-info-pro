@@ -43,13 +43,18 @@ export {
   getRandomCountries,
   getCountriesByPopulation,
   getCountriesByArea,
+  getCountriesByBorderCount,
+  sortCountries,
+  getAllCurrencies,
+  getAllLanguages,
+  getAllTimezones,
   formatCountry,
   compareCountries,
   validatePostalCode,
   getClosestCountries,
 } from "./core/utils";
 
-export type { CountrySummary } from "./core/utils";
+export type { CountrySummary, SortField } from "./core/utils";
 
 // Types
 export type {

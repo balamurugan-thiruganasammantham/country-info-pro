@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-04-15
+
+### Added
+- **`sortCountries(countries, field, order)`**: sort any country array by name, population, area, capital, or region (asc/desc). Returns new array, does not mutate.
+- **`getCountriesByBorderCount(count)`**: find countries with exactly N land borders (0 = island nations)
+- **`getAllCurrencies()`**: returns all unique currencies with code, name, symbol, and list of countries using each
+- **`getAllLanguages()`**: returns all unique languages with ISO code, name, and list of countries
+- **`getAllTimezones()`**: returns all unique timezones with associated countries
+- **`SortField` type**: exported union type for sortCountries field parameter
+- **50+ aliases** in `getCountry()`: added England, Scotland, Emirates, Czech Republic, RSA, Saudi, NZ, Hong Kong, DPRK, PRC, Trinidad, Bosnia, and more
+- **CONTRIBUTING.md**: contributor guide with setup, guidelines, and project structure
+- 11 new unit tests (138 total across 5 test files)
+
+### Improved
+- Total exported functions: 38 → 43
+- Total exported types: 16 → 17 (SortField)
+- Alias map expanded from 28 → 50+ entries for better `getCountry()` coverage
+
 ## [1.4.0] - 2026-04-15
 
 ### Added

@@ -157,6 +157,115 @@ export function getCountriesByArea(
   });
 }
 
+/** Valid sort fields for sortCountries(). */
+export type SortField = "name" | "population" | "area" | "capital" | "region";
+
+/**
+ * Sorts an array of countries by a given field.
+ * Returns a new sorted array (does not mutate the original).
+ */
+export function sortCountries(
+  countries: Country[],
+  field: SortField = "name",
+  order: "asc" | "desc" = "asc"
+): Country[] {
+  const sorted = [...countries];
+  const dir = order === "asc" ? 1 : -1;
+
+  sorted.sort((a, b) => {
+    switch (field) {
+      case "name":
+        return dir * a.name.common.localeCompare(b.name.common);
+      case "population":
+        return dir * (a.population - b.population);
+      case "area":
+        return dir * (a.area - b.area);
+      case "capital":
+        return dir * (a.capital[0] ?? "").localeCompare(b.capital[0] ?? "");
+      case "region":
+        return dir * a.region.localeCompare(b.region);
+      default:
+        return 0;
+    }
+  });
+
+  return sorted;
+}
+
+/**
+ * Returns countries with exactly the specified number of land borders.
+ * Use 0 for island nations, 1+ for specific border counts.
+ */
+export function getCountriesByBorderCount(count: number): Country[] {
+  return getAll().filter((c) => c.borders.length === count);
+}
+
+/**
+ * Returns all unique currencies used across all countries.
+ * Each entry includes the currency code, name, symbol, and list of countries using it.
+ */
+export function getAllCurrencies(): Array<{
+  code: string;
+  name: string;
+  symbol: string;
+  countries: string[];
+}> {
+  const map = new Map<string, { name: string; symbol: string; countries: string[] }>();
+  for (const c of getAll()) {
+    for (const [code, info] of Object.entries(c.currencies)) {
+      if (!map.has(code)) {
+        map.set(code, { name: info.name, symbol: info.symbol, countries: [] });
+      }
+      map.get(code)!.countries.push(c.cca2);
+    }
+  }
+  return Array.from(map.entries())
+    .map(([code, info]) => ({ code, ...info }))
+    .sort((a, b) => a.code.localeCompare(b.code));
+}
+
+/**
+ * Returns all unique languages spoken across all countries.
+ * Each entry includes the ISO 639 code, language name, and list of countries.
+ */
+export function getAllLanguages(): Array<{
+  code: string;
+  name: string;
+  countries: string[];
+}> {
+  const map = new Map<string, { name: string; countries: string[] }>();
+  for (const c of getAll()) {
+    for (const [code, name] of Object.entries(c.languages)) {
+      if (!map.has(code)) {
+        map.set(code, { name, countries: [] });
+      }
+      map.get(code)!.countries.push(c.cca2);
+    }
+  }
+  return Array.from(map.entries())
+    .map(([code, info]) => ({ code, ...info }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Returns all unique timezones across all countries with their associated countries.
+ */
+export function getAllTimezones(): Array<{
+  timezone: string;
+  countries: string[];
+}> {
+  const map = new Map<string, string[]>();
+  for (const c of getAll()) {
+    for (const tz of c.timezones) {
+      if (!map.has(tz)) map.set(tz, []);
+      map.get(tz)!.push(c.cca2);
+    }
+  }
+  return Array.from(map.entries())
+    .map(([timezone, countries]) => ({ timezone, countries }))
+    .sort((a, b) => a.timezone.localeCompare(b.timezone));
+}
+
 /** Simplified country summary for common use cases. */
 export interface CountrySummary {
   name: string;

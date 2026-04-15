@@ -7,6 +7,12 @@ import {
   getRandomCountries,
   getCountriesByPopulation,
   getCountriesByArea,
+  getCountriesByBorderCount,
+  sortCountries,
+  getAllCurrencies,
+  getAllLanguages,
+  getAllTimezones,
+  getAllCountries,
   formatCountry,
   filterCountries,
   compareCountries,
@@ -289,6 +295,94 @@ describe("filterCountries with population/area ranges", () => {
     });
     expect(countries.length).toBeGreaterThan(0);
     expect(countries.every((c) => c.area <= 500)).toBe(true);
+  });
+});
+
+describe("sortCountries", () => {
+  it("sorts by name ascending", () => {
+    const all = getAllCountries();
+    const sorted = sortCountries(all, "name", "asc");
+    expect(sorted[0].name.common.localeCompare(sorted[1].name.common)).toBeLessThanOrEqual(0);
+    expect(sorted.length).toBe(250);
+  });
+
+  it("sorts by population descending", () => {
+    const all = getAllCountries();
+    const sorted = sortCountries(all, "population", "desc");
+    expect(sorted[0].population).toBeGreaterThan(sorted[1].population);
+    // China or India should be first
+    expect(["CN", "IN"]).toContain(sorted[0].cca2);
+  });
+
+  it("sorts by area ascending", () => {
+    const all = getAllCountries();
+    const sorted = sortCountries(all, "area", "asc");
+    expect(sorted[0].area).toBeLessThanOrEqual(sorted[1].area);
+  });
+
+  it("does not mutate original array", () => {
+    const all = getAllCountries();
+    const first = all[0].cca2;
+    sortCountries(all, "population", "desc");
+    expect(all[0].cca2).toBe(first);
+  });
+});
+
+describe("getCountriesByBorderCount", () => {
+  it("returns island nations (0 borders)", () => {
+    const islands = getCountriesByBorderCount(0);
+    expect(islands.length).toBeGreaterThan(50);
+    const codes = islands.map((c) => c.cca2);
+    expect(codes).toContain("JP");
+    expect(codes).toContain("AU");
+    expect(codes).not.toContain("IN"); // India has 6 borders
+  });
+
+  it("returns countries with exactly 1 border", () => {
+    const one = getCountriesByBorderCount(1);
+    expect(one.length).toBeGreaterThan(3);
+    const codes = one.map((c) => c.cca2);
+    expect(codes).toContain("PT"); // Portugal borders only Spain
+  });
+});
+
+describe("getAllCurrencies", () => {
+  it("returns all unique currencies", () => {
+    const currencies = getAllCurrencies();
+    expect(currencies.length).toBeGreaterThan(100);
+    const usd = currencies.find((c) => c.code === "USD");
+    expect(usd).toBeDefined();
+    expect(usd!.name).toBe("United States dollar");
+    expect(usd!.symbol).toBe("$");
+    expect(usd!.countries).toContain("US");
+  });
+
+  it("is sorted by code", () => {
+    const currencies = getAllCurrencies();
+    for (let i = 1; i < currencies.length; i++) {
+      expect(currencies[i - 1].code.localeCompare(currencies[i].code)).toBeLessThanOrEqual(0);
+    }
+  });
+});
+
+describe("getAllLanguages", () => {
+  it("returns all unique languages", () => {
+    const languages = getAllLanguages();
+    expect(languages.length).toBeGreaterThan(100);
+    const eng = languages.find((l) => l.code === "eng");
+    expect(eng).toBeDefined();
+    expect(eng!.name).toBe("English");
+    expect(eng!.countries.length).toBeGreaterThan(10);
+  });
+});
+
+describe("getAllTimezones", () => {
+  it("returns all unique timezones", () => {
+    const timezones = getAllTimezones();
+    expect(timezones.length).toBeGreaterThan(30);
+    const utc530 = timezones.find((t) => t.timezone === "UTC+05:30");
+    expect(utc530).toBeDefined();
+    expect(utc530!.countries).toContain("IN");
   });
 });
 
