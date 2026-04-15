@@ -149,3 +149,23 @@
 - Pre-extracting search fields was the #1 performance optimization on the roadmap
 - `getRandomCountries` and range filters were the most commonly requested API gaps
 - `formatCountry` addresses the common need for a simple flat object for APIs/forms
+
+## [2026-04-15] — Improvement Cycle 6 (v1.5.0)
+
+### Added
+- **5 new API functions**: `sortCountries()`, `getCountriesByBorderCount()`, `getAllCurrencies()`, `getAllLanguages()`, `getAllTimezones()`
+- **`SortField` type**: union of "name" | "population" | "area" | "capital" | "region"
+- **50+ aliases** in getCountry(): England, Scotland, Emirates, Czech Republic, RSA, Saudi, NZ, Hong Kong, DPRK, PRC, Trinidad, Bosnia, etc.
+- **CONTRIBUTING.md**: contributor guide with setup, guidelines, project structure
+- **11 new tests** (138 total)
+
+### Improved
+- Total exported functions: 38 → 43
+- Alias map: 28 → 50+ entries for better getCountry() coverage
+- README updated with new functions, examples, and counts
+
+### Reason
+- Aggregate data accessors (currencies, languages, timezones) fill a major API gap — developers frequently need "list all X" queries
+- sortCountries() eliminates boilerplate for common sorting operations
+- Border count filter enables unique queries (island nations, landlocked with few borders)
+- Expanded aliases improve discoverability via getCountry() for casual users
